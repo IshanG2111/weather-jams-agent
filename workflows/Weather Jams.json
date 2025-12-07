@@ -1,0 +1,423 @@
+{
+  "name": "Weather Jams",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1792,
+        -96
+      ],
+      "id": "f8e93d7d-afa3-4274-8d8b-9d19faebfd19",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "2c1a9b71-df79-80c3-bc51-f45c3df8215a",
+          "mode": "list",
+          "cachedResultName": "2c1a9b71-df79-80c3-bc51-f45c3df8215a",
+          "cachedResultUrl": "https://www.notion.so/2c1a9b71df7980c3bc51f45c3df8215a"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Song |title",
+              "title": "={{ $json.track.name }}"
+            },
+            {
+              "key": "Album|rich_text",
+              "textContent": "={{ $json.track.album.name }}"
+            },
+            {
+              "key": "Artist|rich_text",
+              "textContent": "={{ $json.track.album.artists[0].name }}"
+            },
+            {
+              "key": "Spotify Track ID|rich_text",
+              "textContent": "={{ $json.track.album.artists[0].id }}"
+            },
+            {
+              "key": "Spotify URL|url",
+              "urlValue": "={{ $json.track.album.artists[0].external_urls.spotify }}"
+            },
+            {
+              "key": "Date & Time|date",
+              "date": "={{ $json.played_at }}"
+            },
+            {
+              "key": "cover|files",
+              "fileUrls": {
+                "fileUrl": [
+                  {
+                    "name": "1",
+                    "url": "={{ $json.track.album.images[0].url }}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        -288
+      ],
+      "id": "421156d3-bcb3-41bd-b2d5-234808c9b750",
+      "name": "Create a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "tXGBOyQuGSlZgiHN",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        -208
+      ],
+      "id": "38099a98-0f02-4463-ae5d-4f825c689bbb",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "5JGvwZMMjBYWfYzE",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1808,
+        -432
+      ],
+      "id": "4af92b35-d9c4-430c-9f2d-db979f1ef8c4",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Role: You are an expert Music Supervisor for cinema, known for curating atmospheric soundtracks.\n\nInput Data:\n- Weather Condition: {{ $json.weather[0].main }}\n- Temperature: {{ $json.main.temp }}°C\n- Time of Day: Morning (Implied)\n\nTask: Analyze the inputs and generate a Spotify Search Query that captures the specific \"Texture\" of this moment.\nLogic Rules:\n1. If Weather is \"Rain\" or \"Drizzle\" OR \"Mist\":\n   - And Temp < 20°C: Focus on \"Cozy, Acoustic, Lo-fi, Jazz, Melancholic\".\n   - And Temp > 25°C: Focus on \"Tropical, Humid, Indie-Folk\".\n2. If Weather is \"Clear\" or \"Clouds\":\n   - And Temp < 15°C: Focus on \"Crisp, Folk, Bon Iver style\".\n   - And Temp > 25°C: Focus on \"Sunny, Upbeat, Psych-Rock, City Pop\".\n3. If Weather is \"Thunderstorm\": Focus on \"Dark, Cinematic, Ambient, Electronic\".\n\nOutput Format:\nReturn ONLY a raw JSON object. Do NOT write \"```json\" or any introductory text.\n{\n  \"q\": \"string (3-4 keywords for Spotify Search. Example: 'misty morning jazz piano')\",\n  \"vibe_label\": \"string (A poetic 2-word title for the UI. Example: 'Velvet Fog')\",\n  \"hex_color\": \"string (A hex code matching the mood. Example: '#4a5b6c')\"\n}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -1040,
+        -432
+      ],
+      "id": "28546609-3446-4953-9347-d6f6846cfd76",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "cityName": "={{ $json.content }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        -1216,
+        -432
+      ],
+      "id": "af5196f6-8c7c-4d7f-a236-ce1f2fb6c266",
+      "name": "OpenWeatherMap",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "K1m5GNbLg28JtlpK",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.spotify.com/v1/search",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "spotifyOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.q }}"
+            },
+            {
+              "name": "type",
+              "value": "track"
+            },
+            {
+              "name": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -576,
+        -432
+      ],
+      "id": "87e7b605-e45d-4d42-b5e6-d844e21de516",
+      "name": "HTTP Request",
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "aEW5afHQrCcYOFOU",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get raw text\nconst rawText = items[0].json.text;\n\n// 2. Clean Markdown\nconst cleanText = rawText.replace(/```json|```/g, \"\").trim();\n\n// 3. Parse\ntry {\n  const parsedData = JSON.parse(cleanText);\n  return { json: parsedData };\n} catch (error) {\n  throw new Error(\"JSON Parse Failed: \" + cleanText);\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -752,
+        -432
+      ],
+      "id": "5f0cf48f-7c6d-4f28-9948-356f14312c4b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get tracks\nconst tracks = items[0].json.tracks.items;\n\n// 2. Build Notion Blocks (Checklist)\nconst contentBlocks = tracks.map(t => ({\n  object: \"block\",\n  type: \"to_do\",\n  to_do: {\n    rich_text: [\n      {\n        type: \"text\",\n        text: {\n          content: `${t.name} - ${t.artists[0].name}`,\n          link: { url: t.external_urls.spotify }\n        }\n      }\n    ],\n    checked: false\n  }\n}));\n\n// 3. Extract Top Song & Image\nreturn {\n  json: {\n    page_blocks: contentBlocks,\n    top_song_link: tracks[0].external_urls.spotify,\n    hero_image: tracks[0].album.images[0].url\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        -432
+      ],
+      "id": "49f050f4-084c-4453-8139-1b44b53013fc",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "2c2a9b71-df79-8091-8112-ea99a91f2dc1",
+          "mode": "list",
+          "cachedResultName": "Weather Jams",
+          "cachedResultUrl": "https://www.notion.so/2c2a9b71df7980918112ea99a91f2dc1"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Weather|rich_text",
+              "textContent": "={{ $('OpenWeatherMap').item.json.weather[0].main }} - {{ $('OpenWeatherMap').item.json.main.temp }}°C"
+            },
+            {
+              "key": "Vibe|select",
+              "selectValue": "={{ $('Code in JavaScript').item.json.vibe_label }}"
+            },
+            {
+              "key": "Date|title",
+              "title": "={{ new Date().toLocaleDateString() }}"
+            },
+            {
+              "key": "Play Top Song|url",
+              "urlValue": "={{ $json.top_song_link }}"
+            },
+            {
+              "key": "City|rich_text",
+              "textContent": "={{ $('OpenWeatherMap').item.json.name }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "image",
+              "url": "={{ $json.hero_image }}"
+            },
+            {
+              "type": "heading_1",
+              "textContent": "={{ $('HTTP Request').item.json.tracks.items[0].album.name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        -432
+      ],
+      "id": "6c1315a1-07dc-49ac-9566-ea01d7b1636d",
+      "name": "Create a database page2",
+      "credentials": {
+        "notionApi": {
+          "id": "tXGBOyQuGSlZgiHN",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gemma3:1b",
+          "mode": "list",
+          "cachedResultName": "gemma3:1b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Pretend you’re a cosmic dice-roller selecting a city from the entire map of India. Spin the imaginary globe, stop at a random spot, and output exactly one Indian city name that comes to mind first. Use maximum randomness. Do not add any explanations, punctuation, or extra words—only the city name."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        -432
+      ],
+      "id": "bb4b9965-05f9-4354-b4c5-dd1e3cf5a1c0",
+      "name": "Random City",
+      "credentials": {
+        "ollamaApi": {
+          "id": "xzaKZzCRPY9rqBd9",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Random City",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Create a database page2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Random City": {
+      "main": [
+        [
+          {
+            "node": "OpenWeatherMap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7cc82154-35a8-4364-a192-826830dc771b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2e346752b505082ad5840fc607f0237cd7736c2ae449374a821843fb92b38d8e"
+  },
+  "id": "o0QtLGguhZQ7YqKa",
+  "tags": []
+}
