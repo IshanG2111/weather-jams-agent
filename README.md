@@ -1,12 +1,55 @@
 # 🌦️ Weather Jams: AI-Powered Atmospheric DJ
 
-**Weather Jams** is an autonomous AI agent that curates Spotify playlists based on real-time weather conditions. Unlike simple "if/else" bots, it uses **Google Gemini (LLM)** to semantically interpret live weather data and translate it into musical “vibes” (e.g., *“moody piano for cold rainy evenings”*).
+**Weather Jams** is an autonomous AI agent that curates Spotify playlists based on real-time weather conditions. Unlike simple "if/else" bots, it uses **Google Gemini (LLM)** to semantically interpret[...]
 
 <div align="center">
-  <img src="assets/demo_dashboard.png" alt="Weather Jams Dashboard" width="800">
+  <!-- Dashboard Screenshot (using raw GitHub URL so it always renders) -->
+  <img
+    src="assests/demo_dashboard.png"
+    alt="Weather Jams Dashboard"
+    width="800"
+  >
   <br />
   <sub><em>Weather Jams dashboard: weather → vibe → curated Spotify tracks in Notion</em></sub>
 </div>
+
+---
+
+## 🔁 Flow Overview (Preview)
+
+Below is the high-level n8n workflow for Weather Jams:
+
+```mermaid
+graph LR
+    %% Node Styling Definitions
+    classDef trigger fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000;
+    classDef ai fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000;
+    classDef api fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000;
+    classDef db fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px,color:#000;
+    classDef n8n fill:#fafafa,stroke:#9e9e9e,stroke-width:2px,stroke-dasharray: 5 5,color:#000;
+
+    %% Nodes
+    Cron((⏱️ 8:00 AM)):::trigger
+    
+    subgraph Workflow["⚡ n8n Automation Agent"]
+        direction LR
+        Weather[🌤️ OpenWeatherMap]:::api
+        Brain{🧠 Gemini 1.5}:::ai
+        Spotify[🎧 Spotify Search]:::api
+        Formatter[⚙️ Code Logic]:::n8n
+    end
+
+    Database[📒 Notion Dashboard]:::db
+
+    %% Connections
+    Cron -->|"Trigger"| Weather
+    Weather -->|"Temp & Condition"| Brain
+    Brain -->|"Semantic Query"| Spotify
+    Spotify -->|"Raw JSON"| Formatter
+    Formatter -->|"Block Data"| Database
+```
+
+> On GitHub, this Mermaid diagram will render automatically. For other viewers, support may vary.
 
 ---
 
