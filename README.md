@@ -49,7 +49,17 @@ graph LR
     Formatter -->|"Block Data"| Database
 ```
 
-> On GitHub, this Mermaid diagram will render automatically. For other viewers, support may vary.
+<div align="center">
+  <!-- Dashboard Screenshot (using raw GitHub URL so it always renders) -->
+  <img
+    src="assests/n8n_workflow.png"
+    alt="n8n Worlflow"
+    width="800"
+  >
+  <br />
+  <sub><em>Weather Jams n8n worlflow</em></sub>
+</div>
+
 
 ---
 
