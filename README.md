@@ -23,6 +23,6 @@ During development, I discovered that Spotify deprecated their `Recommendations`
 * **Solution:** I re-engineered the logic to use **Semantic Search**. I prompted the LLM to translate numerical weather data into descriptive search strings (e.g., "melancholic acoustic guitar"), effectively bypassing the limitation while retaining high relevance.
 
 ## 🚀 How to Run
-1.  Import `workflows/weather_jams_n8n_v2.json` into n8n.
+1.  Import `workflows/weather_jams.json` into n8n.
 2.  Set up Spotify OAuth2 credentials.
 3.  Create a Notion Database with a "Gallery" view.
