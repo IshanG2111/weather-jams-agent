@@ -112,7 +112,7 @@ The system operates on a polling architecture:
 ## 🛠️ Technical Stack
 
 - **Orchestration:** n8n (Node-based automation)
-- **AI Model:** Google Gemini 1.5 Flash (prompt-engineered for “vibe” generation)
+- **AI Model:** Google Gemini 2.5 Flash (prompt-engineered for “vibe” generation)
 - **APIs:** Spotify Web API, OpenWeatherMap REST API
 - **Database / Frontend:** Notion (Gallery View as a lightweight UI)
 
