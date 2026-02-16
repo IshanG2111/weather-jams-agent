@@ -34,7 +34,7 @@ graph LR
     subgraph Workflow["⚡ n8n Automation Agent"]
         direction LR
         Weather[🌤️ OpenWeatherMap]:::api
-        Brain{🧠 Gemini 1.5}:::ai
+        Brain{🧠 Gemini 2.5}:::ai
         Spotify[🎧 Spotify Search]:::api
         Formatter[⚙️ Code Logic]:::n8n
     end
