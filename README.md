@@ -169,6 +169,33 @@ Result: The system became **more flexible and expressive** than the original num
    - Watch new curated tracks appear in the Notion gallery based on the current weather.
 
 ---
+### 🔑 Credential Configuration
+
+After importing the workflow, you will see red warning icons on several nodes. You must link your own API keys for the automation to function:
+
+#### **A. OpenWeatherMap**
+1. Sign up at [OpenWeatherMap](https://openweathermap.org/api) and generate a free API Key.
+2. In n8n, open the **OpenWeatherMap** node → **Credentials** → **Create New** and paste your key.
+
+#### **B. Google Gemini**
+1. Obtain an API key from [Google AI Studio](https://aistudio.google.com/).
+2. In n8n, open the **Google Gemini Chat Model** node → **Credentials** → **Create New** and paste your key.
+
+#### **C. Spotify (OAuth2)**
+1. Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard).
+2. Add your n8n OAuth Redirect URL to the Spotify app settings.
+3. In n8n, open the **HTTP Request** node → **Credentials** → **Create New (Spotify OAuth2)** and enter your Client ID and Client Secret.
+
+#### **D. Notion Integration**
+1. Create an internal integration at [Notion Developers](https://www.notion.so/my-integrations).
+2. **Important:** In your Notion Workspace, open your target database and "Invite" the integration you just created so it has permission to write pages.
+3. In n8n, open both **Notion** nodes and re-select your database from the dropdown menu (the original ID is masked for privacy).
+
+#### **E. Ollama (Local LLM)**
+1. Ensure [Ollama](https://ollama.com/) is running locally with the command: `ollama pull gemma3:1b`.
+2. In the **Random City** node, ensure the base URL points to your local instance (usually `http://localhost:11434` or `http://host.docker.internal:11434` if using Docker).
+
+---
 
 ## 📌 Future Ideas
 
